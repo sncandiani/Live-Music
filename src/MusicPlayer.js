@@ -2,10 +2,13 @@ import React, {useState, useEffect} from "react"
 import * as Tone from "tone";
 
 const MusicPlayer = () => {
-    const [musicLoop, setMusicLoop] = useState()
+    const [musicLoop, setMusicLoop] = useState(["C4"])
     const [returnLoop, setReturnLoop] = useState([])
+    const tremolo = new Tone.Tremolo().start()    
     //creates a synth and connects it to master output
     const synth = new Tone.Synth().toMaster();
+    const polySynth = new Tone.PolySynth(musicLoop.length, Tone.Synth).chain(tremolo, Tone.Master)
+
     // When Start is clicked, each note triggered will be saved until stop is clicked
     const startLoop = () => {
         setReturnLoop([])
@@ -17,7 +20,7 @@ const MusicPlayer = () => {
     // On stop click, the loop will be cleared and the music loop will be set
      const endLoop = () => {
         setMusicLoop(returnLoop)
-        setReturnLoop([])
+        setReturnLoop([]) 
      }
     //  On play click, the loop will play musicLoop then clear it 
      const looper = () => {
@@ -30,9 +33,6 @@ const MusicPlayer = () => {
          }
      }
  
-    const chordPlayer = () => {
-        console.log("I'm the chord player!")
-    }
 
     const chordNamer = () => {
         console.log("I will name the chord being played!")
@@ -42,8 +42,8 @@ const MusicPlayer = () => {
        saveLoop()
        endLoop()
    }, [])
-    console.log(returnLoop)
-    console.log(musicLoop)
+
+    
     return ( 
         <>
         <button onClick={() => {
@@ -89,11 +89,10 @@ const MusicPlayer = () => {
             looper()
         }}>Play Notes</button>
 
+        <button onMouseDown={() => {
+            if(musicLoop.length > 1) {polySynth.triggerAttack(musicLoop)}} } onMouseUp={() => {if(musicLoop.length >=1) {polySynth.triggerRelease(musicLoop)} }}>Play Chord</button>
         <button onClick={async() => {
-            chordPlayer()
-        }}>Play Chord</button>
-        <button onClick={async() => {
-            chordNamer()
+            await chordNamer()
         }}>Which chord is this?</button>
         
         </>
